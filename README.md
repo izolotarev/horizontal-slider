@@ -1,1 +1,1 @@
-# izolotarev Vertical Slider
+# Horizontal slider

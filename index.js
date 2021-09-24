@@ -1,111 +1,70 @@
-const wrapper = document.querySelector('.wrapper');
+const slider = document.querySelector('.slider');
+const sliderList = document.querySelector('.slider__list');
+const nextBtn = document.querySelector('.slider__next-btn');
+const prevBtn = document.querySelector('.slider__prev-btn');
+const interval = 3000;
 
-const left = document.querySelector('.slider__left');
-const right = document.querySelector('.slider__right');
+let slides = document.querySelectorAll('.slider__image');
+let index = 1;
+let slideId;
 
-const buttonUp = document.querySelector('.slider__button-up');
-const buttonDown = document.querySelector('.slider__button-down');
+const firstClone = slides[0].cloneNode(true);
+const lastClone = slides[slides.length - 1].cloneNode(true);
 
-let rightSlides = document.querySelectorAll('.slider__image');
-let leftSlides = document.querySelectorAll('.slider__content');
+firstClone.id = 'first-clone';
+lastClone.id = 'last-clone';
 
-let rightIndex = 1;
-let leftIndex = leftSlides.length;
-const sliderHeight = wrapper.clientHeight;
+sliderList.append(firstClone);
+sliderList.prepend(lastClone);
 
-const firstRightClone = rightSlides[0].cloneNode(true);
-const lastRightClone = rightSlides[rightSlides.length - 1].cloneNode(true);
+const slideWidth = slides[index].clientWidth;
 
-const firstLeftClone = leftSlides[0].cloneNode(true);
-const lastLeftClone = leftSlides[leftSlides.length - 1].cloneNode(true);
+sliderList.style.transform = `translateX(${-slideWidth * index}px)`;
 
-firstRightClone.id = 'first-right-clone';
-lastRightClone.id = 'last-right-clone';
-
-firstLeftClone.id = 'first-left-clone';
-lastLeftClone.id = 'last-left-clone';
-
-right.append(firstRightClone);
-right.prepend(lastRightClone);
-
-left.append(firstLeftClone);
-left.prepend(lastLeftClone);
-
-right.style.transform = `translateY(${-sliderHeight * rightIndex}px)`;
-left.style.transform = `translateY(${-sliderHeight * leftIndex}px)`;
-
-buttonUp.addEventListener('click', () => {
-  nextSlide();
-});
-
-buttonDown.addEventListener('click', () => {
-  previousSlide();
-});
-
-document.addEventListener('wheel', (e) => {
-  if (e.deltaY > 0) {
-    nextSlide();
-  } else {
-    previousSlide();
-  }
-});
-
-const getRightSlides = () => document.querySelectorAll('.slider__image');
-const getLeftSlides = () => document.querySelectorAll('.slider__content');
-
-const nextSlide = () => {
-  rightSlides = getRightSlides();
-  if (rightIndex >= rightSlides.length - 1) return;
-  rightIndex++;
-  right.style.transition = '.5s ease-out';
-  right.style.transform = `translateY(${-sliderHeight * rightIndex}px)`;
-
-  leftSlides = getLeftSlides();
-  if (leftIndex <= 0) return;
-  leftIndex--;
-  left.style.transition = '.5s ease-out';
-  left.style.transform = `translateY(${-sliderHeight * leftIndex}px)`;
+const startSlide = () => {
+  slideId = setInterval(() => {
+    moveToNextSlide();
+  }, interval);
 };
 
-const previousSlide = () => {
-  rightSlides = getRightSlides();
-  if (rightIndex <= 0) return;
-  rightIndex--;
-  right.style.transition = '.5s ease-out';
-  right.style.transform = `translateY(${-sliderHeight * rightIndex}px)`;
+const getSlides = () => document.querySelectorAll('.slider__image');
 
-  leftSlides = getLeftSlides();
-  if (leftIndex >= leftSlides.length - 1) return;
-  leftIndex++;
-  left.style.transition = '.5s ease-out';
-  left.style.transform = `translateY(${-sliderHeight * leftIndex}px)`;
-};
-
-right.addEventListener('transitionend', () => {
-  rightSlides = getRightSlides();
-  if (rightSlides[rightIndex].id === firstRightClone.id) {
-    right.style.transition = 'none';
-    rightIndex = 1;
-    right.style.transform = `translateY(${-sliderHeight * rightIndex}px)`;
+sliderList.addEventListener('transitionend', () => {
+  slides = getSlides();
+  if (slides[index].id === firstClone.id) {
+    sliderList.style.transition = 'none';
+    index = 1;
+    sliderList.style.transform = `translateX(${-slideWidth * index}px)`;
   }
 
-  if (rightSlides[rightIndex].id === lastRightClone.id) {
-    right.style.transition = 'none';
-    rightIndex = rightSlides.length - 2;
-    right.style.transform = `translateY(${-sliderHeight * rightIndex}px)`;
-  }
-
-  leftSlides = getLeftSlides();
-
-  if (leftSlides[leftIndex].id === lastLeftClone.id) {
-    left.style.transition = 'none';
-    leftIndex = leftSlides.length - 2;
-    left.style.transform = `translateY(${-sliderHeight * leftIndex}px)`;
-  }
-
-  if (leftSlides[leftIndex].id === firstLeftClone.id) {
-    left.style.transition = 'none';
-    leftIndex = 1;
-    left.style.transform = `translateY(${-sliderHeight * leftIndex}px)`;
+  if (slides[index].id === lastClone.id) {
+    sliderList.style.transition = 'none';
+    index = slides.length - 2;
+    sliderList.style.transform = `translateX(${-slideWidth * index}px)`;
   }
 });
+
+const moveToNextSlide = () => {
+  slides = getSlides();
+  if (index >= slides.length - 1) return;
+  index++;
+  sliderList.style.transition = '.7s ease-out';
+  sliderList.style.transform = `translateX(${-slideWidth * index}px)`;
+};
+
+const moveToPreviousSlide = () => {
+  if (index <= 0) return;
+  index--;
+  sliderList.style.transition = '.7s ease-out';
+  sliderList.style.transform = `translateX(${-slideWidth * index}px)`;
+};
+
+// slider.addEventListener('mouseenter', () => {
+//   clearInterval(slideId);
+// });
+
+//slider.addEventListener('mouseleave', startSlide);
+nextBtn.addEventListener('click', moveToNextSlide);
+prevBtn.addEventListener('click', moveToPreviousSlide);
+
+//startSlide();
